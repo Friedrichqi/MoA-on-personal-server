@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 import streamlit as st
 
-from langchain_community.llms import Ollama
+from langchain_ollama import OllamaLLM as Ollama
 from langchain_ollama import ChatOllama
 from langchain.memory import ConversationBufferMemory
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
@@ -180,7 +180,7 @@ class MOAgent:
             ollama_kwargs["base_url"] = os.getenv(
                 "OLLAMA_HOST",
             )
-
+        print(ollama_kwargs)
         llm = Ollama(**ollama_kwargs)
 
         chain = prompt | llm | StrOutputParser()
@@ -223,13 +223,15 @@ class MOAgent:
 
         stream = self.main_agent.stream(llm_inp)
         response = ""
+        
         for chunk in stream:
             if output_format == "json":
                 yield ResponseChunk(delta=chunk, response_type="output", metadata={})
             else:
                 yield chunk
             response += chunk
-
+        print(f"Final Answer: {response}")
+        print("Final Answer Ends<-------------------------->")
         if save:
             self.chat_memory.save_context({"input": input}, {"output": response})
 
