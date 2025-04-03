@@ -28,10 +28,13 @@ default_config = {
 
 def stream_response(messages):
     """Accumulate the response from a series of message chunks."""
-    response = ""
+    response = final_answer = ""
     for message in messages:
-        response += message["delta"]
-    return response
+        if message['response_type'] != 'output':
+            response += '\n' + str(message['metadata'].get('layer')) + ':\n' + message["delta"]
+        else:
+            final_answer += message["delta"]
+    return response, final_answer
 
 def set_moa_agent(main_model, main_system_prompt, cycles, layer_agent_config,
                   main_temperature, main_api_base, main_api_key, main_num_ctx, main_num_batch, **optional_params):
@@ -86,8 +89,10 @@ def main():
 
         # Call the chat method and accumulate the response
         response_messages = moa_agent.chat(query, output_format="json")
-        response_text = stream_response(response_messages)
+        response_text, final_answer = stream_response(response_messages)
         print("Response:", response_text)
+
+        print("\nFinal Answer Begins:\n", final_answer, "\nFinal Answer Ends")
 
 if __name__ == "__main__":
     main()

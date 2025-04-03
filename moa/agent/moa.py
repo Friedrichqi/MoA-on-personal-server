@@ -230,8 +230,13 @@ class MOAgent:
             else:
                 yield chunk
             response += chunk
-        print(f"Final Answer: {response}")
-        print("Final Answer Ends<-------------------------->")
+        
+        # final_answer = response
+        # yield ResponseChunk(
+        #     delta=final_answer,
+        #     response_type="output",
+        #     metadata={"final": True}
+        # )
         if save:
             self.chat_memory.save_context({"input": input}, {"output": response})
 
