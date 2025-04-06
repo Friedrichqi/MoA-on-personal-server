@@ -5,7 +5,7 @@ from moa.agent import MOAgent
 # Update the default configuration
 default_config = {
     "main_model": "phi4:latest",
-    "main_system_prompt": "You are a helpful assistant. Written text should always use British English spelling.",
+    "main_system_prompt": "You are a helpful assistant. Written text should always use British English spelling. You should end up your answer with '\nA: ' your numerical result.",
     "cycles": 2,
     "layer_agent_config": {
         "layer_agent_1": {
@@ -69,8 +69,8 @@ def main():
     cycles = default_config["cycles"]
     layer_agent_config = default_config["layer_agent_config"]
     main_temperature = 0.6
-    main_api_base = ""#os.getenv("OLLAMA_HOST", "http://localhost:11434")
-    main_api_key = ""#"ollama"
+    main_api_base = ""
+    main_api_key = ""
     main_num_ctx = 2048
     main_num_batch = None
 
