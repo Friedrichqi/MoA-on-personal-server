@@ -69,7 +69,7 @@ def main():
             for entry in entries:
                 f.write(json.dumps(entry) + "\n")
 
-        pdb.set_trace()
+        #pdb.set_trace()
             
 
 if __name__ == "__main__":
