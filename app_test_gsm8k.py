@@ -5,16 +5,17 @@ from moa.agent import MOAgent
 from grade_school_math.dataset import get_examples, GSMDataset, is_correct, extract_answer
 from grade_school_math import sample
 import time
+import re
 
 # Update the default configuration
 default_config = {
     "main_model": "phi4:latest",
-    "main_system_prompt": "You are a helpful assistant. Written text should always use British English spelling. You should end up your answer with '\n#### ' your numerical result.",
+    "main_system_prompt": "You are a helpful assistant. You have been provided with a set of responses from various open-source models to the latest user query. Your task is to synthesize these responses into a single, high-quality response. It is crucial to critically evaluate the information provided in these responses, recognizing that some of it may be biased or incorrect. Your response should not simply replicate the given answers but should offer a refined, accurate, and comprehensive reply to the instruction. Ensure your response is well-structured, coherent, and adheres to the highest standards of accuracy and reliability.", # You should end up your answer with your final numerical result without any further explanation.",
     "cycles": 2,
     "layer_agent_config": {
         "layer_agent_1": {
             "system_prompt": "Written text should always use British English spelling. Think through your response step by step. {helper_response}",
-            "model_name": "llama3.2:3b",
+            "model_name": "llama3.1:8b",
             "temperature": 0.6,
         },
         "layer_agent_2": {
@@ -84,6 +85,12 @@ def main():
         main_temperature, main_api_base, main_api_key, main_num_ctx, main_num_batch
     )
 
+    # judge_prompt = "Given the following procedural paragraph and a golden_answer, extract the final numerical answer from the paragraph and determine whether it is equal to the golden_answer. Ignore formatting differences (e.g., 100.0 vs 100) but consider only the final numerical result stated. \nRespond with only True if the final answer matches the golden_answer, or False if it does not.\n"
+    # moa_judge = set_moa_agent(
+    #     main_model, judge_prompt, cycles, layer_agent_config,
+    #     main_temperature, main_api_base, main_api_key, main_num_ctx, main_num_batch
+    # )
+
     test_instances = get_examples("test")
     moa_agent.chat("how are you?", output_format="json")
     for item in test_instances:
@@ -94,10 +101,14 @@ def main():
         elapsed_time = time.time() - start_time
 
         response_text , final_answer = stream_response(response_messages)
-        # print("\nFinal Answer Begins:\n", final_answer, "\nFinal Answer Ends")
+        numbers = re.findall(r'-?[\d,]+\.?\d*', final_answer)
+        numbers = [num.replace(',', '') for num in numbers]
 
-        result = is_correct(final_answer, item)
-        
+        # final_numerical_value = "#### " + str(numbers[-1])
+
+        # result = is_correct(final_numerical_value, item)
+        result = extract_answer(item["answer"]) in numbers
+
         updated = False
         entries = []
         if os.path.exists("gsm8k_out.jsonl"):
@@ -128,20 +139,9 @@ def main():
         with open("gsm8k_out.jsonl", "w") as f:
             for entry in entries:
                 f.write(json.dumps(entry) + "\n")
-            
+
         pdb.set_trace()
-
-    # while True:
-    #     query = input(">> ")
-    #     if query.lower() == 'quit':
-    #         break
-
-    #     # Call the chat method and accumulate the response
-    #     response_messages = moa_agent.chat(query, output_format="json")
-    #     response_text, final_answer = stream_response(response_messages)
-    #     print("Response:", response_text)
-
-    #     print("\nFinal Answer Begins:\n", final_answer, "\nFinal Answer Ends")
+            
 
 if __name__ == "__main__":
     main()
