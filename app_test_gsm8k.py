@@ -9,13 +9,13 @@ import re
 
 # Update the default configuration
 default_config = {
-    "main_model": "phi4:latest",
-    "main_system_prompt": "You are a helpful assistant. You have been provided with a set of responses from various open-source models to the latest user query. Your task is to synthesize these responses into a single, high-quality response. It is crucial to critically evaluate the information provided in these responses, recognizing that some of it may be biased or incorrect. Your response should not simply replicate the given answers but should offer a refined, accurate, and comprehensive reply to the instruction. Ensure your response is well-structured, coherent, and adheres to the highest standards of accuracy and reliability.", # You should end up your answer with your final numerical result without any further explanation.",
+    "main_model": "deepseek-r1:14b",
+    "main_system_prompt": "You are a helpful assistant. You have been provided with a set of responses from various open-source models to the latest user query. Your task is to synthesize these responses into a single, high-quality response. It is crucial to critically evaluate the information provided in these responses, recognizing that some of it may be biased or incorrect. Your response should not simply replicate the given answers but should offer a refined, accurate, and comprehensive reply to the instruction. Ensure your response is well-structured, coherent, and adheres to the highest standards of accuracy and reliability. End up your answer with a single numerical value without further explanation.",
     "cycles": 2,
     "layer_agent_config": {
         "layer_agent_1": {
             "system_prompt": "Written text should always use British English spelling. Think through your response step by step. {helper_response}",
-            "model_name": "llama3.1:8b",
+            "model_name": "deepseek-r1:8b",
             "temperature": 0.6,
         },
         "layer_agent_2": {
@@ -24,7 +24,7 @@ default_config = {
             "temperature": 0.5,
         },
         "layer_agent_3": {
-            "system_prompt": "You are an expert programmer. Written text should always use British English spelling. Always use the latest libraries and techniques. {helper_response}",
+            "system_prompt": "You are an expert mathematician. Written text should always use British English spelling. Always use the latest libraries and techniques. {helper_response}",
             "model_name": "qwen2.5:7b",
             "temperature": 0.3,
         },
@@ -91,11 +91,31 @@ def main():
     #     main_temperature, main_api_base, main_api_key, main_num_ctx, main_num_batch
     # )
 
+    # Initial Start-up
     test_instances = get_examples("test")
     moa_agent.chat("how are you?", output_format="json")
+
     for item in test_instances:
         question = item["question"]
 
+        existed = False
+        if os.path.exists("gsm8k_out.jsonl"):
+            with open("gsm8k_out.jsonl", "r") as f:
+                for line in f:
+                    entry = json.loads(line)
+                    try:
+                        if entry["question"] == question:
+                            existed = True
+                            break
+                    except:
+                        print("Error processing line:", line)
+                        continue
+        
+        
+        # Skip finished questions
+        if existed:
+            continue
+        
         start_time = time.time()
         response_messages = list(moa_agent.chat(question, output_format="json"))
         elapsed_time = time.time() - start_time
@@ -104,44 +124,20 @@ def main():
         numbers = re.findall(r'-?[\d,]+\.?\d*', final_answer)
         numbers = [num.replace(',', '') for num in numbers]
 
-        # final_numerical_value = "#### " + str(numbers[-1])
-
         # result = is_correct(final_numerical_value, item)
         result = extract_answer(item["answer"]) in numbers
 
-        updated = False
-        entries = []
-        if os.path.exists("gsm8k_out.jsonl"):
-            with open("gsm8k_out.jsonl", "r") as f:
-                for line in f:
-                    entry = json.loads(line)
-                    if entry.get("question") == question:
-                        entry.update({
-                            "golden_answer": item["answer"],
-                            "chat_answer": final_answer,
-                            "result": result,
-                            "output_length": len(response_text.split()),
-                            "time": elapsed_time
-                        })
-                        updated = True
-                    entries.append(entry)
-
-        if not updated:
-            entries.append({
+        with open("gsm8k_out.jsonl", "a") as f:
+            entry = {
                 "question": question,
                 "golden_answer": item["answer"],
                 "chat_answer": final_answer,
                 "result": result,
-                "output_length": len(response_text.split()),
+                "output_length": len(final_answer.split()),
                 "time": elapsed_time
-            })
+            }
+            f.write(json.dumps(entry) + "\n")
 
-        with open("gsm8k_out.jsonl", "w") as f:
-            for entry in entries:
-                f.write(json.dumps(entry) + "\n")
-
-        #pdb.set_trace()
-            
 
 if __name__ == "__main__":
     main()
