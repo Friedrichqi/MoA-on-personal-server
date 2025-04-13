@@ -102,8 +102,8 @@ def main():
         if os.path.exists("gsm8k_out.jsonl"):
             with open("gsm8k_out.jsonl", "r") as f:
                 for line in f:
-                    entry = json.loads(line)
                     try:
+                        entry = json.loads(line)
                         if entry["question"] == question:
                             existed = True
                             break
