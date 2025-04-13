@@ -10,23 +10,23 @@ import re
 # Update the default configuration
 default_config = {
     "main_model": "deepseek-r1:14b",
-    "main_system_prompt": "You are a helpful assistant. You have been provided with a set of responses from various open-source models to the latest user query. Your task is to synthesize these responses into a single, high-quality response. It is crucial to critically evaluate the information provided in these responses, recognizing that some of it may be biased or incorrect. Your response should not simply replicate the given answers but should offer a refined, accurate, and comprehensive reply to the instruction. Ensure your response is well-structured, coherent, and adheres to the highest standards of accuracy and reliability. End up your answer with a single numerical value without further explanation.",
+    "main_system_prompt": "You are a mathematician expert. You have been provided with a set of responses from various open-source models to the latest user query. Your task is to synthesize these responses into a single, high-quality response. It is crucial to critically evaluate the information provided in these responses, recognizing that some of it may be biased or incorrect. Your response should not simply replicate the given answers but should offer a refined, accurate, and comprehensive reply to the instruction. Ensure your response is well-structured, coherent, and adheres to the highest standards of accuracy and reliability. End up your answer with a single numerical value without further explanation.",
     "cycles": 2,
     "layer_agent_config": {
         "layer_agent_1": {
             "system_prompt": "Written text should always use British English spelling. Think through your response step by step. {helper_response}",
-            "model_name": "deepseek-r1:8b",
-            "temperature": 0.6,
+            "model_name": "qwen2-math:7b",
+            "temperature": 0.75,
         },
         "layer_agent_2": {
             "system_prompt": "Written text should always use British English spelling. Respond with a thought and then your response to the question. {helper_response}",
-            "model_name": "phi4:latest",
+            "model_name": "qwen2-math:7b",
             "temperature": 0.5,
         },
         "layer_agent_3": {
-            "system_prompt": "You are an expert mathematician. Written text should always use British English spelling. Always use the latest libraries and techniques. {helper_response}",
-            "model_name": "qwen2.5:7b",
-            "temperature": 0.3,
+            "system_prompt": "You are a mathematician expert. Written text should always use British English spelling. Always use the latest libraries and techniques. {helper_response}",
+            "model_name": "qwen2-math:7b",
+            "temperature": 0.25,
         },
     },
 }
@@ -108,7 +108,7 @@ def main():
                             existed = True
                             break
                     except:
-                        print("Error processing line:", line)
+                        # print("Error processing line:", line)
                         continue
         
         
