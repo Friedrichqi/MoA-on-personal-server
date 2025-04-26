@@ -117,6 +117,7 @@ class MOAgent:
                     "model_name": "mistral-nemo:12b-instruct-2407-q6_K",
                 },
             }
+
         parallel_chain_map = dict()
         for key, value in layer_agent_config.items():
             chain = MOAgent._create_agent_from_system_prompt(
@@ -179,7 +180,7 @@ class MOAgent:
             ollama_kwargs["base_url"] = os.getenv(
                 "OLLAMA_HOST",
             )
-        # print(ollama_kwargs)
+        print(ollama_kwargs)
         llm = Ollama(**ollama_kwargs)
 
         chain = prompt | llm | StrOutputParser()
@@ -202,28 +203,6 @@ class MOAgent:
             "helper_response": "",
         }
         for cyc in range(cycles):
-            # You can change layer Agent configuration here
-            """if cyc > 0:
-                layer_agent_config = {
-                    "layer_agent_1": {
-                        "system_prompt": "You are a mathematician expert, tasked with reviewing the solution to a mathematical problem. Your mission is to carefully examine the reasoning, computations, and conclusions of the proposed solution, and determine whether the solution is correct, internally consistent, and mathematically sound. Please perform the following checks: 1. Verify the Logic: Are the steps in the reasoning valid and logically connected? 2. Recompute Critical Steps: Independently recompute important equations or derivations to confirm accuracy. 3. Check Assumptions: Are there any hidden or incorrect assumptions? Are all necessary conditions clearly stated and valid? 4. Confirm the Final Answer: Does the final answer make sense given the problem's requirements? 5. Identify Gaps or Errors: If you find inconsistencies, mistakes, or alternative interpretations, clearly explain them. {helper_response}",
-                        "model_name": "qwen2-math:7b",
-                        "temperature": 0.75,
-                    },
-                    "layer_agent_2": {
-                        "system_prompt": "You are a mathematician expert, tasked with reviewing the solution to a mathematical problem. Your mission is to carefully examine the reasoning, computations, and conclusions of the proposed solution, and determine whether the solution is correct, internally consistent, and mathematically sound. Please perform the following checks: 1. Verify the Logic: Are the steps in the reasoning valid and logically connected? 2. Recompute Critical Steps: Independently recompute important equations or derivations to confirm accuracy. 3. Check Assumptions: Are there any hidden or incorrect assumptions? Are all necessary conditions clearly stated and valid? 4. Confirm the Final Answer: Does the final answer make sense given the problem's requirements? 5. Identify Gaps or Errors: If you find inconsistencies, mistakes, or alternative interpretations, clearly explain them. {helper_response}",
-                        "model_name": "qwen2-math:7b",
-                        "temperature": 0.5,
-                    },
-                    "layer_agent_3": {
-                        "system_prompt": "You are a mathematician expert, tasked with reviewing the solution to a mathematical problem. Your mission is to carefully examine the reasoning, computations, and conclusions of the proposed solution, and determine whether the solution is correct, internally consistent, and mathematically sound. Please perform the following checks: 1. Verify the Logic: Are the steps in the reasoning valid and logically connected? 2. Recompute Critical Steps: Independently recompute important equations or derivations to confirm accuracy. 3. Check Assumptions: Are there any hidden or incorrect assumptions? Are all necessary conditions clearly stated and valid? 4. Confirm the Final Answer: Does the final answer make sense given the problem's requirements? 5. Identify Gaps or Errors: If you find inconsistencies, mistakes, or alternative interpretations, clearly explain them. {helper_response}",
-                        "model_name": "qwen2-math:7b",
-                        "temperature": 0.25,
-                    },
-                }
-                self.layer_agent = MOAgent._configure_layer_agent(
-                    layer_agent_config, api_request_callback
-                )"""
             layer_output = self.layer_agent.invoke(llm_inp)
             l_frm_resp = layer_output["formatted_response"]
             l_resps = layer_output["responses"]

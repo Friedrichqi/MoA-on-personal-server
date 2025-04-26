@@ -11,6 +11,11 @@ import re
 default_config = {
     "main_model": "deepseek-r1:14b",
     "main_system_prompt": "You are a mathematician expert. You have been provided with a set of responses from various open-source models to the latest user query. Your task is to synthesize these responses into a single, high-quality response. It is crucial to critically evaluate the information provided in these responses, recognizing that some of it may be biased or incorrect. Your response should not simply replicate the given answers but should offer a refined, accurate, and comprehensive reply to the instruction. Ensure your response is well-structured, coherent, and adheres to the highest standards of accuracy and reliability. End up your answer with a single numerical value without further explanation.",
+    "main_temperature": 0.6,
+    "main_api_base": "",
+    "main_api_key": "",
+    "main_num_ctx": 2048,
+    "main_num_batch": None,
     "cycles": 2,
     "layer_agent_config": {
         "layer_agent_1": {
@@ -68,28 +73,21 @@ def set_moa_agent(main_model, main_system_prompt, cycles, layer_agent_config,
     )
 
 def main():
-    # Configuration parameters – these can be loaded from a config file or environment variables
     main_model = default_config["main_model"]
     main_system_prompt = default_config["main_system_prompt"]
+    main_temperature = default_config["main_temperature"]
+    main_api_base = default_config["main_api_base"]
+    main_api_key = default_config["main_api_key"]
+    main_num_ctx = default_config["main_num_ctx"]
+    main_num_batch = default_config["main_num_batch"]
     cycles = default_config["cycles"]
     layer_agent_config = default_config["layer_agent_config"]
-    main_temperature = 0.6
-    main_api_base = ""
-    main_api_key = ""
-    main_num_ctx = 2048
-    main_num_batch = None
 
     # Initialize the MOAgent for headless inference
     moa_agent = set_moa_agent(
         main_model, main_system_prompt, cycles, layer_agent_config,
         main_temperature, main_api_base, main_api_key, main_num_ctx, main_num_batch
     )
-
-    # judge_prompt = "Given the following procedural paragraph and a golden_answer, extract the final numerical answer from the paragraph and determine whether it is equal to the golden_answer. Ignore formatting differences (e.g., 100.0 vs 100) but consider only the final numerical result stated. \nRespond with only True if the final answer matches the golden_answer, or False if it does not.\n"
-    # moa_judge = set_moa_agent(
-    #     main_model, judge_prompt, cycles, layer_agent_config,
-    #     main_temperature, main_api_base, main_api_key, main_num_ctx, main_num_batch
-    # )
 
     # Initial Start-up
     test_instances = get_examples("test")

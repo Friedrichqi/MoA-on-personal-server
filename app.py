@@ -2,15 +2,20 @@ import os
 import json
 from moa.agent import MOAgent
 
-# Update the default configuration
+# Update the default configuration here
 default_config = {
     "main_model": "phi4:latest",
     "main_system_prompt": "You are a helpful assistant. Written text should always use British English spelling. You should end up your answer with '\nA: ' your numerical result.",
+    "main_temperature": 0.6,
+    "main_api_base": "",
+    "main_api_key": "",
+    "main_num_ctx": 2048,
+    "main_num_batch": None,
     "cycles": 2,
     "layer_agent_config": {
         "layer_agent_1": {
             "system_prompt": "Written text should always use British English spelling. Think through your response step by step. {helper_response}",
-            "model_name": "llama3.2:3b",
+            "model_name": "llama3.1:8b",
             "temperature": 0.6,
         },
         "layer_agent_2": {
@@ -63,16 +68,15 @@ def set_moa_agent(main_model, main_system_prompt, cycles, layer_agent_config,
     )
 
 def main():
-    # Configuration parameters – these can be loaded from a config file or environment variables
     main_model = default_config["main_model"]
     main_system_prompt = default_config["main_system_prompt"]
+    main_temperature = default_config["main_temperature"]
+    main_api_base = default_config["main_api_base"]
+    main_api_key = default_config["main_api_key"]
+    main_num_ctx = default_config["main_num_ctx"]
+    main_num_batch = default_config["main_num_batch"]
     cycles = default_config["cycles"]
     layer_agent_config = default_config["layer_agent_config"]
-    main_temperature = 0.6
-    main_api_base = ""
-    main_api_key = ""
-    main_num_ctx = 2048
-    main_num_batch = None
 
     # Initialize the MOAgent for headless inference
     moa_agent = set_moa_agent(

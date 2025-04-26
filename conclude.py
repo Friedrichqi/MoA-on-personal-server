@@ -9,7 +9,7 @@ total_time = 0
 total_output_length = 0
 total_success = 0
 num = total_success = 0
-with open("gsm8k_out_deepseekr1_14b.jsonl", "r") as f:
+with open("gsm8k_out.jsonl", "r") as f:
     for line in f:
         try:
             entry = json.loads(line)
