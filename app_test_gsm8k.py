@@ -14,24 +14,27 @@ default_config = {
     "main_temperature": 0.6,
     "main_api_base": "",
     "main_api_key": "",
-    "main_num_ctx": 2048,
+    "main_num_ctx": 16384,
     "main_num_batch": None,
     "cycles": 2,
     "layer_agent_config": {
         "layer_agent_1": {
             "system_prompt": "Written text should always use British English spelling. Think through your response step by step. {helper_response}",
-            "model_name": "qwen2-math:7b",
+            "model_name": "deepseek-r1:14b",
             "temperature": 0.75,
+            "num_ctx": 16384,
         },
         "layer_agent_2": {
             "system_prompt": "Written text should always use British English spelling. Respond with a thought and then your response to the question. {helper_response}",
-            "model_name": "qwen2-math:7b",
+            "model_name": "deepseek-r1:14b",
             "temperature": 0.5,
+            "num_ctx": 16384,
         },
         "layer_agent_3": {
             "system_prompt": "You are a mathematician expert. Written text should always use British English spelling. Always use the latest libraries and techniques. {helper_response}",
-            "model_name": "qwen2-math:7b",
+            "model_name": "deepseek-r1:14b",
             "temperature": 0.25,
+            "num_ctx": 16384,
         },
     },
 }
