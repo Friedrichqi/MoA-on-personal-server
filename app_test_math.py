@@ -2,8 +2,8 @@ import os
 import json
 import pdb
 from moa.agent import MOAgent
-from grade_school_math.dataset import get_examples, GSMDataset, is_correct, extract_answer
-from grade_school_math import sample
+from MATH.dataset import get_examples, GSMDataset, is_correct, extract_answer
+from MATH import sample
 import time
 import re
 import signal
@@ -26,7 +26,7 @@ default_config = {
             "num_ctx": 16384,
         },
         "layer_agent_2": {
-            "system_prompt": "Written text should always use British English spelling. Respond with a thought and then your response to the question. {helper_response}",
+            "system_prompt": "Written text should always use British English spelling. Respond with a thought and then your response to the problem. {helper_response}",
             "model_name": "deepseek-r1:14b",
             "temperature": 0.5,
             "num_ctx": 16384,
@@ -94,27 +94,24 @@ def main():
     )
 
     # Initial Start-up
-    test_instances = get_examples("test")
+    test_instances = get_examples("test_all")
     # moa_agent.chat("how are you?", output_format="json")
 
     for item in test_instances:
-        question = item["question"]
+        problem = item["problem"]
 
         existed = False
-        if os.path.exists("gsm8k_out.jsonl"):
-            with open("gsm8k_out.jsonl", "r") as f:
+        if os.path.exists("MATH_out.jsonl"):
+            with open("MATH_out.jsonl", "r") as f:
                 for line in f:
                     try:
                         entry = json.loads(line)
-                        if entry["question"] == question:
+                        if entry["problem"] == problem:
                             existed = True
                             break
                     except:
-                        # print("Error processing line:", line)
                         continue
         
-        
-        # Skip finished questions
         if existed:
             continue
         
@@ -122,13 +119,13 @@ def main():
             raise TimeoutError()
 
         start_time = time.time()
-        signal.signal(signal.SIGALRM, timeout_handler)
-        signal.alarm(300)  # Set timeout to 300 seconds (5 minutes)
+        # signal.signal(signal.SIGALRM, timeout_handler)
+        # signal.alarm(900)
         try:
-            response_messages = list(moa_agent.chat(question, output_format="json"))
+            response_messages = list(moa_agent.chat(problem, output_format="json"))
         except TimeoutError:
             elapsed_time = time.time() - start_time
-            print("Timeout reached for this question, skipping...")
+            print("Timeout reached for this problem, skipping...")
             break  # Move on to the next test instance
         finally:
             signal.alarm(0)  # Disable the alarm
@@ -136,18 +133,18 @@ def main():
         elapsed_time = time.time() - start_time
 
         response_text , final_answer = stream_response(response_messages)
-        numbers = re.findall(r'-?[\d,]+\.?\d*', final_answer)
-        numbers = [num.replace(',', '') for num in numbers]
+        # numbers = re.findall(r'-?[\d,]+\.?\d*', final_answer)
+        # numbers = [num.replace(',', '') for num in numbers]
 
-        # result = is_correct(final_numerical_value, item)
-        result = extract_answer(item["answer"]) in numbers
+        # # result = is_correct(final_numerical_value, item)
+        # result = extract_answer(item["answer"]) in numbers
 
-        with open("gsm8k_out.jsonl", "a") as f:
+        with open("MATH_out.jsonl", "a") as f:
             entry = {
-                "question": question,
-                "golden_answer": item["answer"],
+                "problem": item["problem"],
+                "golden_answer": item["solution"],
+                "extra_info": item["extra_info"],
                 "chat_answer": final_answer,
-                "result": result,
                 "output_length": len(final_answer.split()),
                 "time": elapsed_time
             }
