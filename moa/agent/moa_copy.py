@@ -117,7 +117,6 @@ class MOAgent:
                     "model_name": "mistral-nemo:12b-instruct-2407-q6_K",
                 },
             }
-
         parallel_chain_map = dict()
         for key, value in layer_agent_config.items():
             chain = MOAgent._create_agent_from_system_prompt(
@@ -180,7 +179,7 @@ class MOAgent:
             ollama_kwargs["base_url"] = os.getenv(
                 "OLLAMA_HOST",
             )
-        print(ollama_kwargs)
+        # print(ollama_kwargs)
         llm = Ollama(**ollama_kwargs)
 
         chain = prompt | llm | StrOutputParser()

@@ -7,6 +7,7 @@ from MATH import sample
 import time
 import re
 import signal
+from tqdm import tqdm
 
 # Update the default configuration
 default_config = {
@@ -97,7 +98,7 @@ def main():
     test_instances = get_examples("test_all")
     # moa_agent.chat("how are you?", output_format="json")
 
-    for item in test_instances:
+    for item in tqdm(test_instances):
         problem = item["problem"]
 
         existed = False

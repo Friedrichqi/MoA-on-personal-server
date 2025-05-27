@@ -12,11 +12,11 @@ from tqdm import tqdm
 # Update the default configuration
 default_config = {
     "main_model": "deepseek-r1:14b",
-    "main_system_prompt": "You are a mathematician expert. You have been provided with a set of responses from various open-source models to the latest user query. Your task is to synthesize these responses into a single, high-quality response. It is crucial to critically evaluate the information provided in these responses, recognizing that some of it may be biased or incorrect. Your response should not simply replicate the given answers but should offer a refined, accurate, and comprehensive reply to the instruction. Ensure your response is well-structured, coherent, and adheres to the highest standards of accuracy and reliability. End up your answer with a single numerical value without further explanation.",
-    "main_temperature": 0.6,
+    "main_system_prompt": "You are a mathematician expert. You have been provided with a set of responses from various open-source models to the latest user query. Your task is to synthesize these responses into a single, high-quality response. It is crucial to critically evaluate the information provided in these responses, recognizing that some of it may be biased or incorrect. Your response should not simply replicate the given answers but should offer a refined, accurate, and comprehensive reply to the instruction. Ensure your response is well-structured, coherent, and adheres to the highest standards of accuracy and reliability.",
+    "main_temperature": 0.8,
     "main_api_base": "",
     "main_api_key": "",
-    "main_num_ctx": 16384,
+    "main_num_ctx": 131072,
     "main_num_batch": None,
     "cycles": 2,
     "layer_agent_config": {
@@ -24,19 +24,19 @@ default_config = {
             "system_prompt": "Written text should always use British English spelling. Think through your response step by step. {helper_response}",
             "model_name": "qwen2-math:7b",
             "temperature": 0.75,
-            "num_ctx": 16384,
+            "num_ctx": 131072,
         },
         "layer_agent_2": {
             "system_prompt": "Written text should always use British English spelling. Respond with a thought and then your response to the problem. {helper_response}",
-            "model_name": "phi4:latest",
+            "model_name": "qwen2-math:7b",
             "temperature": 0.5,
-            "num_ctx": 16384,
+            "num_ctx": 131072,
         },
         "layer_agent_3": {
             "system_prompt": "You are a mathematician expert. Written text should always use British English spelling. Always use the latest libraries and techniques. {helper_response}",
-            "model_name": "qwen2.5:7b",
+            "model_name": "qwen2-math:7b",
             "temperature": 0.25,
-            "num_ctx": 16384,
+            "num_ctx": 131072,
         },
     },
 }
@@ -102,8 +102,8 @@ def main():
         problem = item["problem"]
 
         existed = False
-        if os.path.exists("MATH_out_config3.jsonl"):
-            with open("MATH_out_config3.jsonl", "r") as f:
+        if os.path.exists("MATH_out_config5.jsonl"):
+            with open("MATH_out_config5.jsonl", "r") as f:
                 for line in f:
                     try:
                         entry = json.loads(line)
@@ -140,7 +140,7 @@ def main():
         # # result = is_correct(final_numerical_value, item)
         # result = extract_answer(item["answer"]) in numbers
 
-        with open("MATH_out_config3.jsonl", "a") as f:
+        with open("MATH_out_config5.jsonl", "a") as f:
             entry = {
                 "problem": item["problem"],
                 "golden_answer": item["solution"],

@@ -143,6 +143,7 @@ class MOAgent:
                 MessagesPlaceholder(variable_name="messages", optional=True),
                 ("human", "{input}"),
                 ("system", "{helper_response}"),
+                ("human", "{input}"),
             ]
         )
 
